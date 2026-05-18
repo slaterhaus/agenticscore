@@ -1,0 +1,280 @@
+openapi: "3.1.0"
+info:
+  title: Pet Store API
+  version: "1.0.0"
+  description: A sample API for managing a pet store inventory.
+  contact:
+    name: API Support
+    email: support@petstore.example.com
+  license:
+    name: MIT
+
+tags:
+  - name: pets
+    description: Operations for managing pets
+  - name: inventory
+    description: Store inventory management
+
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      summary: List all available pets
+      description: Returns a paginated list of pets currently in the store. Supports filtering by species and availability status.
+      tags: [pets]
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of pets to return (1-100)
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          description: Number of pets to skip for pagination
+          schema:
+            type: integer
+            default: 0
+        - name: species
+          in: query
+          description: Filter by species (dog, cat, bird, reptile)
+          schema:
+            type: string
+            enum: [dog, cat, bird, reptile]
+        - name: available
+          in: query
+          description: Filter by availability status
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: A list of pets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PetList"
+              example:
+                pets:
+                  - id: "pet-001"
+                    name: "Buddy"
+                    species: "dog"
+                    breed: "Golden Retriever"
+                    available: true
+                    price: 450.00
+                total: 42
+                limit: 20
+                offset: 0
+        "400":
+          description: Invalid query parameters
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    post:
+      operationId: createPet
+      summary: Add a new pet to the store
+      description: Creates a new pet listing in the store inventory. Requires species, name, and price at minimum.
+      tags: [pets]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePetRequest"
+            example:
+              name: "Whiskers"
+              species: "cat"
+              breed: "Siamese"
+              price: 350.00
+              available: true
+      responses:
+        "201":
+          description: Pet created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+              example:
+                id: "pet-002"
+                name: "Whiskers"
+                species: "cat"
+                breed: "Siamese"
+                available: true
+                price: 350.00
+                createdAt: "2026-05-08T10:30:00Z"
+        "400":
+          description: Validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+              example:
+                type: "https://api.petstore.example.com/errors/validation"
+                title: "Validation Failed"
+                status: 400
+                detail: "Field 'species' must be one of: dog, cat, bird, reptile"
+
+  /pets/{petId}:
+    get:
+      operationId: getPetById
+      summary: Get a specific pet by ID
+      description: Returns full details for a single pet including health records and adoption history.
+      tags: [pets]
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          description: Unique identifier of the pet
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Pet details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "404":
+          description: Pet not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  /inventory/stats:
+    get:
+      operationId: getInventoryStats
+      summary: Get store inventory statistics
+      description: Returns aggregate counts of pets by species and availability. Used for dashboard reporting.
+      tags: [inventory]
+      responses:
+        "200":
+          description: Inventory statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryStats"
+              example:
+                totalPets: 42
+                available: 35
+                bySpecies:
+                  dog: 15
+                  cat: 18
+                  bird: 6
+                  reptile: 3
+
+components:
+  schemas:
+    Pet:
+      type: object
+      description: A pet available in the store
+      properties:
+        id:
+          type: string
+          description: Unique pet identifier
+        name:
+          type: string
+          description: Pet's name
+        species:
+          type: string
+          enum: [dog, cat, bird, reptile]
+          description: Animal species
+        breed:
+          type: string
+          description: Specific breed within the species
+        available:
+          type: boolean
+          description: Whether the pet is available for adoption
+        price:
+          type: number
+          format: double
+          description: Adoption fee in USD
+        createdAt:
+          type: string
+          format: date-time
+          description: When the listing was created
+      example:
+        id: "pet-001"
+        name: "Buddy"
+        species: "dog"
+        breed: "Golden Retriever"
+        available: true
+        price: 450.00
+        createdAt: "2026-05-01T09:00:00Z"
+
+    CreatePetRequest:
+      type: object
+      description: Request body for creating a new pet listing
+      required: [name, species, price]
+      properties:
+        name:
+          type: string
+          description: Pet's name
+        species:
+          type: string
+          enum: [dog, cat, bird, reptile]
+          description: Animal species
+        breed:
+          type: string
+          description: Specific breed
+        price:
+          type: number
+          format: double
+          description: Adoption fee in USD
+        available:
+          type: boolean
+          default: true
+          description: Whether immediately available
+
+    PetList:
+      type: object
+      description: Paginated list of pets with metadata
+      properties:
+        pets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Pet"
+        total:
+          type: integer
+          description: Total number of pets matching the query
+        limit:
+          type: integer
+          description: Page size used
+        offset:
+          type: integer
+          description: Offset used
+
+    InventoryStats:
+      type: object
+      description: Aggregate inventory statistics for the store
+      properties:
+        totalPets:
+          type: integer
+          description: Total pets in inventory
+        available:
+          type: integer
+          description: Number currently available
+        bySpecies:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Count per species
+
+    ProblemDetail:
+      type: object
+      description: RFC 9457 Problem Detail for HTTP APIs
+      properties:
+        type:
+          type: string
+          format: uri
+          description: URI reference identifying the problem type
+        title:
+          type: string
+          description: Short human-readable summary
+        status:
+          type: integer
+          description: HTTP status code
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence
