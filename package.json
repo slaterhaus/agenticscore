@@ -1,0 +1,67 @@
+{
+  "name": "agenticscore",
+  "version": "1.0.0",
+  "description": "Score any API's readiness for AI agent consumption. Upload an OpenAPI spec, get a 0-100 Agentic Readiness score with fix recommendations.",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "bin": {
+    "agenticscore": "./dist/src/cli.js"
+  },
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./scoring": "./dist/src/scoring/engine.js",
+    "./rules": "./dist/src/scoring/rules.js"
+  },
+  "files": [
+    "dist/src",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsx watch src/cli.ts",
+    "build": "tsc",
+    "test": "vitest",
+    "serve": "tsx watch api/server.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "openapi",
+    "api",
+    "ai-agent",
+    "llm",
+    "scoring",
+    "linting",
+    "developer-tools",
+    "agent-readiness",
+    "api-quality",
+    "claude",
+    "gpt",
+    "function-calling"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/slaterhaus/agenticscore"
+  },
+  "homepage": "https://github.com/slaterhaus/agenticscore#readme",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "commander": "^12.0.0",
+    "picocolors": "^1.1.0"
+  },
+  "optionalDependencies": {
+    "hono": "^4.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.16.0",
+    "vitest": "^2.0.0",
+    "@types/js-yaml": "^4.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
