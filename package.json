@@ -1,6 +1,6 @@
 {
   "name": "agenticscore",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Score any API's readiness for AI agent consumption. Upload an OpenAPI spec, get a 0-100 Agentic Readiness score with fix recommendations.",
   "type": "module",
   "main": "dist/src/index.js",
@@ -45,7 +45,7 @@
     "type": "git",
     "url": "https://github.com/slaterhaus/agenticscore"
   },
-  "homepage": "https://github.com/slaterhaus/agenticscore#readme",
+  "homepage": "https://www.agenticscore.dev",
   "dependencies": {
     "js-yaml": "^4.1.0",
     "commander": "^12.0.0",
