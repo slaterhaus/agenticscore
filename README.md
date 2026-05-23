@@ -1,4 +1,4 @@
-# AgenticScore
+# [AgenticScore](https://www.agenticscore.dev)
 
 **Score any API's readiness for AI agent consumption.**
 
